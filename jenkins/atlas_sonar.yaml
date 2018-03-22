@@ -1,0 +1,44 @@
+#----- Deployment
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: atlas_sonar
+  namespace: atlas_udd
+  labels:
+    name: atlas_sonar
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: atlas_sonar
+      labels:
+        name: atlas_sonar
+    spec:
+      containers:
+        - image: sonarqube
+          name: atlas_sonar
+          env:
+            - name: SONARQUBE_JDBC_USERNAME
+              value: sonar
+            - name: SONARQUBE_JDBC_PASSWORD
+              value: sonar
+            - name: SONARQUBE_JDBC_URL
+              value: mysql://atlas_mysql:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance
+          ports:
+            - containerPort: 9000
+              name: sonarport
+#----- Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlas_sonar
+  namespace: atlas_udd
+  labels:
+    name: atlas_sonar
+spec:
+  ports:
+    - port: 80
+      targetPort: 9000
+      name: sonarport
+  selector:
+    name: atlas_sonar

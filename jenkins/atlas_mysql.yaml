@@ -1,0 +1,45 @@
+#----- Deployment
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  #name: sonar-postgres
+  name: atlas_mysql
+  namespace: atlas_udd
+  labels:
+    name: atlas_mysql
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: atlas_mysql
+      labels:
+        name: atlas_mysql
+    spec:
+      containers:
+        - image: mysql
+          name: atlas_mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: secret
+            - name: MYSQL_DATABASE
+              value: sonar
+            - name: MYSQL_USER
+              value: sonar
+            - name: MYSQL_PASSWORD
+              value: sonar
+          ports:
+            - containerPort: 3306
+              name: mysqlport
+#----- Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlas_mysql  
+  namespace: atlas_udd
+  labels:
+    name: atlas_mysql
+spec:
+  ports:
+    - port: 5432
+  selector:
+    name: atlas_mysql 
